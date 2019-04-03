@@ -568,6 +568,7 @@ void MainWindow::drawBern(MyMesh * _mesh)
 
 void MainWindow::on_addControlPointButton_clicked()
 {
+    resetAllColorsAndThickness(&mesh);
     MyMesh * _mesh = &mesh;
     //qDebug() << _mesh->n_vertices();
     //resetAllColorsAndThickness(_mesh);
@@ -575,12 +576,16 @@ void MainWindow::on_addControlPointButton_clicked()
         {static_cast<GLfloat>(ui->coordXSpinBox->value()),
          static_cast<GLfloat>(ui->coordYSpinBox->value()),
          static_cast<GLfloat>(ui->coordZSpinBox->value())};
-    mesh.add_vertex(MyMesh::Point(pointCoords));
+    MyMesh::Point pt = MyMesh::Point(pointCoords);
+    int idx = _mesh->add_vertex(pt).idx();
+    //mesh.add_vertex(pt);
+    map_ctrl_pts.insert(idx,pt);
+
     vectpts.push_back(MyMesh::Point(pointCoords));
     //vectpts.push_back(MyMesh::Point(pointCoords));
     //drawBern(_mesh);
-    _mesh->set_color(_mesh->vertex_handle(0), MyMesh::Color(0, 0, 255));
-    _mesh->data(_mesh->vertex_handle(0)).thickness = 12;
+    //_mesh->set_color(_mesh->vertex_handle(0), MyMesh::Color(0, 0, 255));
+    //_mesh->data(_mesh->vertex_handle(0)).thickness = 12;
     if (_mesh->n_vertices() > 2) {
         qDebug() << __FUNCTION__ << " in if condition";
         std::vector<MyMesh::VertexHandle > vector_vertex_for_face_handle;
@@ -588,15 +593,16 @@ void MainWindow::on_addControlPointButton_clicked()
         /*vector_vertex_for_face_handle.push_back(_mesh->vertex_handle(static_cast<unsigned int>(_mesh->n_vertices()-3)));
         vector_vertex_for_face_handle.push_back(_mesh->vertex_handle(static_cast<unsigned int>(_mesh->n_vertices()-2)));
         vector_vertex_for_face_handle.push_back(_mesh->vertex_handle(static_cast<unsigned int>(_mesh->n_vertices()-1)));*/
-        for(int i = 0;i<_mesh->n_vertices();i++)
+        /*for(int i = 0;i<_mesh->n_vertices();i++)
         {
             vector_vertex_for_face_handle.push_back(_mesh->vertex_handle(i));
 
-            _mesh->add_face(vector_vertex_for_face_handle);
-        }
+
+        }*/
 
     }
-    resetAllColorsAndThickness(&mesh);
+    setColors(_mesh);
+
     displayMesh(_mesh);
     qDebug() << _mesh->n_vertices();
 
@@ -610,7 +616,26 @@ void MainWindow::on_clear_button_clicked()
     resetAllColorsAndThickness(&mesh);
     displayMesh(_mesh);
 }
+void MainWindow::setColors(MyMesh * _mesh)
+{
+    if(!map_ctrl_pts.isEmpty())
+    {
+        foreach(MyMesh::Point pt, map_ctrl_pts)
+        {
+            _mesh->set_color(_mesh->vertex_handle(map_ctrl_pts.key(pt)), MyMesh::Color(0, 255, 0));
+            _mesh->data(_mesh->vertex_handle(map_ctrl_pts.key(pt))).thickness = 12;
+        }
+    }
+    if(!map_dis_pts.isEmpty())
+    {
+        foreach(MyMesh::Point pt, map_dis_pts)
+        {
+            _mesh->set_color(_mesh->vertex_handle(map_dis_pts.key(pt)), MyMesh::Color(0, 0, 255));
+            _mesh->data(_mesh->vertex_handle(map_dis_pts.key(pt))).thickness = 10;
+        }
+    }
 
+}
 MyMesh::Point MainWindow::discretisation(MyMesh *_mesh,float t,float dt, int i)
 {
     MyMesh::Point pt = pow(1 -t,3)*vectpts.at(i)
@@ -635,24 +660,30 @@ MyMesh::Point MainWindow::discretisation(MyMesh *_mesh,float t,float dt, int i)
     }*/
 }
 
+
+
 void MainWindow::on_draw_button_clicked()
 {
     MyMesh * _mesh = &mesh;
+    resetAllColorsAndThickness(&mesh);
     float t = 0;
     float dt = 0;
     float rangemin;
     float rangemax;
     int n = 10;
-    int m = 10;
+    int m = vectpts.size();
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < m; j++)
+        for (int j = 0; j < m - 3; j++)
         {
-            discretisation(_mesh,t/n,dt,i);
+            MyMesh::Point pt = discretisation(_mesh,t,dt,j);
+            map_dis_pts.insert(_mesh->add_vertex(pt).idx(),pt);
+
+            t = t + 1.0/ n;
         }
     }
 
+    setColors(_mesh);
 
-    resetAllColorsAndThickness(&mesh);
     displayMesh(_mesh);
 }

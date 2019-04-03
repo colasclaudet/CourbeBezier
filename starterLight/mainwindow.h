@@ -5,7 +5,7 @@
 #include <QMainWindow>
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-
+#include <QMap>
 namespace Ui {
 class MainWindow;
 }
@@ -52,6 +52,7 @@ public:
     void drawBern(MyMesh * _mesh);
     MyMesh::Point discretisation(MyMesh * _mesh,float t,float dt, int i);
     void polynomB();
+    void setColors(MyMesh * _mesh);
 private slots:
 
     void on_pushButton_chargement_clicked();
@@ -75,6 +76,9 @@ private:
 
     bool modevoisinage;
     QVector <MyMesh::Point> vectpts;
+
+    QMap <int, MyMesh::Point> map_ctrl_pts;
+    QMap <int, MyMesh::Point> map_dis_pts;
     MyMesh mesh;
 
     int vertexSelection;
