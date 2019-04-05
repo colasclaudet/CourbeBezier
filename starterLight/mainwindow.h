@@ -93,6 +93,12 @@ private slots:
 
     void on_draw_button_clicked();
 
+    void on_u_slider_sliderMoved(int position);
+
+    void on_v_slider_sliderMoved(int position);
+
+    void on_pushButton_clicked();
+
 private:
 
     bool modevoisinage;
@@ -108,6 +114,9 @@ private:
 
     int largeur = 0;
     int profondeur = 0;
+
+    float pas_u = 5.0;
+    float pas_v = 5.0;
 
     Ui::MainWindow *ui;
 };

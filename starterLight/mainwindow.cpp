@@ -177,7 +177,7 @@ void MainWindow::on_pushButton_bordure_clicked()
     showBorder(&mesh);
 }
 
-void MainWindow::on_pushButton_voisinage_clicked()
+/*void MainWindow::on_pushButton_voisinage_clicked()
 {
     // changement de mode entre avec et sans voisinage
     if(modevoisinage)
@@ -196,7 +196,7 @@ void MainWindow::on_pushButton_voisinage_clicked()
         showSelections(&mesh);
     else
         showSelectionsNeighborhood(&mesh);
-}
+}*/
 
 
 void MainWindow::on_pushButton_vertexMoins_clicked()
@@ -251,7 +251,7 @@ void MainWindow::on_pushButton_edgePlus_clicked()
         showSelectionsNeighborhood(&mesh);
 }
 
-void MainWindow::on_pushButton_faceMoins_clicked()
+/*void MainWindow::on_pushButton_faceMoins_clicked()
 {
     // mise à jour de l'interface
     faceSelection = faceSelection - 1;
@@ -262,9 +262,9 @@ void MainWindow::on_pushButton_faceMoins_clicked()
         showSelections(&mesh);
     else
         showSelectionsNeighborhood(&mesh);
-}
+}*/
 
-void MainWindow::on_pushButton_facePlus_clicked()
+/*void MainWindow::on_pushButton_facePlus_clicked()
 {
     // mise à jour de l'interface
     faceSelection = faceSelection + 1;
@@ -275,7 +275,7 @@ void MainWindow::on_pushButton_facePlus_clicked()
         showSelections(&mesh);
     else
         showSelectionsNeighborhood(&mesh);
-}
+}*/
 
 void MainWindow::on_pushButton_afficherChemin_clicked()
 {
@@ -615,6 +615,9 @@ void MainWindow::on_clear_button_clicked()
 {
     MyMesh * _mesh = &mesh;
     _mesh->clear();
+    map_dis_pts.clear();
+    map_ctrl_pts.clear();
+    vectpts.clear();
     resetAllColorsAndThickness(&mesh);
     displayMesh(_mesh);
 }
@@ -781,6 +784,7 @@ MyMesh::Point MainWindow::discretisation(MyMesh *_mesh,float t,float dt, int i)
 
 void MainWindow::refreshCtrlPts(MyMesh *_mesh)
 {
+    map_dis_pts.clear();
     _mesh->clear();
     int i = 0;
     foreach(MyMesh::Point pt, map_ctrl_pts)
@@ -832,11 +836,11 @@ void MainWindow::on_draw_button_clicked()
     //MyMesh::Point point = vectpts[0];
 
     float u = 0.0;
-    for (int h=0;h<10;h++)
+    for (int h=0;h<pas_u;h++)
     {
         float v = 0.0;
 
-        for(int p=0; p<10;p++)
+        for(int p=0; p<pas_v;p++)
         {
 
             MyMesh::Point point = vectpts[0];
@@ -880,9 +884,9 @@ void MainWindow::on_draw_button_clicked()
             }
             map_dis_pts.insert(_mesh->add_vertex(point).idx(),point);
 
-            v = v + 1.0/10.0;
+            v = v + 1.0/pas_v;
         }
-        u = u + 1.0/10.0;
+        u = u + 1.0/pas_u;
 
     }
 
@@ -891,4 +895,34 @@ void MainWindow::on_draw_button_clicked()
     setColors(_mesh);
 
     displayMesh(_mesh);
+}
+
+void MainWindow::on_u_slider_sliderMoved(int position)
+{
+    pas_u = static_cast<float> (position);
+    on_draw_button_clicked();
+}
+
+void MainWindow::on_v_slider_sliderMoved(int position)
+{
+    pas_v = static_cast<float> (position);
+    on_draw_button_clicked();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    QString path = QFileDialog::getSaveFileName(this,tr("Save OBJ"),QDir::homePath(), "OBJ (*.obj)");
+    path +=".obj";
+    QFile file(path);
+
+    if(!file.open(QIODevice::WriteOnly |QIODevice::Text))
+        return;
+    QTextStream data(&file);
+    data.setCodec("UTF-8");
+    data<<"g"<<endl;
+    foreach(MyMesh::Point pt, map_ctrl_pts)
+    {
+        data<<"v "<<pt[0]<<" "<<pt[1]<<" "<<pt[2]<<endl;
+    }
+
 }
