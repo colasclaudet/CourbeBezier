@@ -6,6 +6,7 @@
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <QMap>
+#include <QKeyEvent>
 namespace Ui {
 class MainWindow;
 }
@@ -52,7 +53,27 @@ public:
     void drawBern(MyMesh * _mesh);
     MyMesh::Point discretisation(MyMesh * _mesh,float t,float dt, int i);
     void polynomB();
+    void refreshCtrlPts(MyMesh * _mesh);
     void setColors(MyMesh * _mesh);
+    inline void refresh(MyMesh * _mesh)
+    {
+        resetAllColorsAndThickness(&mesh);
+        _mesh->clear();
+        /*foreach(MyMesh::Point pt,map_dis_pts)
+        {
+            if(_mesh->vertex_handle(map_dis_pts.key(pt)).is_valid())
+                _mesh->delete_vertex(_mesh->vertex_handle(map_dis_pts.key(pt)));
+        }*/
+        map_dis_pts.clear();
+        foreach(MyMesh::Point pt,map_ctrl_pts)
+        {
+            _mesh->add_vertex(pt);
+        }
+
+        //setColors(_mesh);
+        //displayMesh(_mesh);
+    };
+    void keyPressEvent(QKeyEvent * event);
 private slots:
 
     void on_pushButton_chargement_clicked();
@@ -84,6 +105,9 @@ private:
     int vertexSelection;
     int edgeSelection;
     int faceSelection;
+
+    int largeur = 0;
+    int profondeur = 0;
 
     Ui::MainWindow *ui;
 };

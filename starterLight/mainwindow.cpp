@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include <stdio.h>
+#include <stdlib.h>
 /* **** début de la partie à compléter **** */
 
 void MainWindow::showSelections(MyMesh* _mesh)
@@ -601,6 +602,7 @@ void MainWindow::on_addControlPointButton_clicked()
         }*/
 
     }
+
     setColors(_mesh);
 
     displayMesh(_mesh);
@@ -623,18 +625,135 @@ void MainWindow::setColors(MyMesh * _mesh)
         foreach(MyMesh::Point pt, map_ctrl_pts)
         {
             _mesh->set_color(_mesh->vertex_handle(map_ctrl_pts.key(pt)), MyMesh::Color(0, 255, 0));
+
             _mesh->data(_mesh->vertex_handle(map_ctrl_pts.key(pt))).thickness = 12;
         }
+        if(vertexSelection>-1 && vertexSelection<map_ctrl_pts.size())
+            _mesh->set_color(_mesh->vertex_handle(vertexSelection), MyMesh::Color(255, 0, 0));
     }
     if(!map_dis_pts.isEmpty())
     {
         foreach(MyMesh::Point pt, map_dis_pts)
         {
             _mesh->set_color(_mesh->vertex_handle(map_dis_pts.key(pt)), MyMesh::Color(0, 0, 255));
-            _mesh->data(_mesh->vertex_handle(map_dis_pts.key(pt))).thickness = 10;
+            _mesh->data(_mesh->vertex_handle(map_dis_pts.key(pt))).thickness = 6;
         }
     }
 
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    MyMesh * _mesh = &mesh;
+    resetAllColorsAndThickness(&mesh);
+    if(event->key() == Qt::Key_W)
+    {
+        if(vertexSelection>0)
+            vertexSelection = vertexSelection -1;
+        else
+            vertexSelection = map_ctrl_pts.size()-1;
+
+    }
+    if(event->key() == Qt::Key_X)
+    {
+        vertexSelection = (vertexSelection +1) % (map_ctrl_pts.size());
+        qDebug()<<"map_ctrl_pts size : "<< map_ctrl_pts.size();
+        qDebug()<<"vertexSelection : "<<vertexSelection;
+    }
+
+    if(event->key() == Qt::Key_Q)
+    {
+        foreach(MyMesh::Point pt, map_ctrl_pts)
+        {
+            if(map_ctrl_pts.key(pt) == vertexSelection)
+            {
+                MyMesh::Point point = pt;
+                point[0]-=0.1;
+                qDebug()<<"On Q pressed : "<<pt[0];
+                map_ctrl_pts.remove(vertexSelection);
+                map_ctrl_pts.insert(vertexSelection,point);
+                refreshCtrlPts(_mesh);
+            }
+        }
+    }
+
+    if(event->key() == Qt::Key_D)
+    {
+        foreach(MyMesh::Point pt, map_ctrl_pts)
+        {
+            if(map_ctrl_pts.key(pt) == vertexSelection)
+            {
+                MyMesh::Point point = pt;
+                point[0]+=0.1;
+                qDebug()<<"On Q pressed : "<<pt[0];
+                map_ctrl_pts.remove(vertexSelection);
+                map_ctrl_pts.insert(vertexSelection,point);
+                refreshCtrlPts(_mesh);
+            }
+        }
+    }
+    if(event->key() == Qt::Key_S)
+    {
+        foreach(MyMesh::Point pt, map_ctrl_pts)
+        {
+            if(map_ctrl_pts.key(pt) == vertexSelection)
+            {
+                MyMesh::Point point = pt;
+                point[1]-=0.1;
+                qDebug()<<"On Q pressed : "<<pt[0];
+                map_ctrl_pts.remove(vertexSelection);
+                map_ctrl_pts.insert(vertexSelection,point);
+                refreshCtrlPts(_mesh);
+            }
+        }
+    }
+    if(event->key() == Qt::Key_Z)
+    {
+        foreach(MyMesh::Point pt, map_ctrl_pts)
+        {
+            if(map_ctrl_pts.key(pt) == vertexSelection)
+            {
+                MyMesh::Point point = pt;
+                point[1]+=0.1;
+                qDebug()<<"On Q pressed : "<<pt[0];
+                map_ctrl_pts.remove(vertexSelection);
+                map_ctrl_pts.insert(vertexSelection,point);
+                refreshCtrlPts(_mesh);
+            }
+        }
+    }
+    if(event->key() == Qt::Key_A)
+    {
+        foreach(MyMesh::Point pt, map_ctrl_pts)
+        {
+            if(map_ctrl_pts.key(pt) == vertexSelection)
+            {
+                MyMesh::Point point = pt;
+                point[2]-=0.1;
+                qDebug()<<"On Q pressed : "<<pt[0];
+                map_ctrl_pts.remove(vertexSelection);
+                map_ctrl_pts.insert(vertexSelection,point);
+                refreshCtrlPts(_mesh);
+            }
+        }
+    }
+    if(event->key() == Qt::Key_E)
+    {
+        foreach(MyMesh::Point pt, map_ctrl_pts)
+        {
+            if(map_ctrl_pts.key(pt) == vertexSelection)
+            {
+                MyMesh::Point point = pt;
+                point[2]+=0.1;
+                qDebug()<<"On Q pressed : "<<pt[0];
+                map_ctrl_pts.remove(vertexSelection);
+                map_ctrl_pts.insert(vertexSelection,point);
+                refreshCtrlPts(_mesh);
+            }
+        }
+    }
+    setColors(_mesh);
+    displayMesh(_mesh);
 }
 MyMesh::Point MainWindow::discretisation(MyMesh *_mesh,float t,float dt, int i)
 {
@@ -660,28 +779,112 @@ MyMesh::Point MainWindow::discretisation(MyMesh *_mesh,float t,float dt, int i)
     }*/
 }
 
+void MainWindow::refreshCtrlPts(MyMesh *_mesh)
+{
+    _mesh->clear();
+    int i = 0;
+    foreach(MyMesh::Point pt, map_ctrl_pts)
+    {
+        int idx = _mesh->add_vertex(pt).idx();
+        vectpts[i] = pt;
+    }
+    //setColors(_mesh);
 
+    //displayMesh(_mesh);
+}
 
+int fact(int n)
+{
+    if(n <=1)
+    {
+        return 1;
+    }
+    else
+        return n*fact(n-1);
+}
+//problème factorielle repasser dessus
 void MainWindow::on_draw_button_clicked()
 {
     MyMesh * _mesh = &mesh;
-    resetAllColorsAndThickness(&mesh);
+    refresh(_mesh);
+    //resetAllColorsAndThickness(&mesh);
     float t = 0;
     float dt = 0;
-    float rangemin;
-    float rangemax;
-    int n = 10;
-    int m = vectpts.size();
+    //float rangemin;
+    //float rangemax;
+
+    //int n = 10;
+    //int m = vectpts.size();
+
+    int n = 2;
+    int m = 4;
+    /*
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < m - 3; j++)
         {
-            MyMesh::Point pt = discretisation(_mesh,t,dt,j);
+            MyMesh::Point pt = discretisation(_mesh,t,n,j);
             map_dis_pts.insert(_mesh->add_vertex(pt).idx(),pt);
-
             t = t + 1.0/ n;
         }
     }
+    */
+    //MyMesh::Point point = vectpts[0];
+
+    float u = 0.0;
+    for (int h=0;h<10;h++)
+    {
+        float v = 0.0;
+
+        for(int p=0; p<10;p++)
+        {
+
+            MyMesh::Point point = vectpts[0];
+            for(int i=0;i<3;++i)
+            {
+                float temp = 0.0;
+
+                for (int j = 0; j < n; ++j)
+                {
+
+                    for (int k = 0; k < m; ++k)
+                    {
+                        /*MyMesh::Point pt = discretisation(_mesh,u,n,j)*discretisation(_mesh,v,n,j);
+                        map_dis_pts.insert(_mesh->add_vertex(pt).idx(),pt);
+
+                        t = t + 1.0/ n;
+                        //u = t;*/
+
+
+                        /*temp += static_cast <float>(((static_cast <float>(fact(n-1.0)))/
+                                                     (static_cast <float>(fact(i))*
+                                                                  static_cast <float>(fact(n-1.0-i))))
+                                *static_cast <float>(pow(u,i))*
+                                static_cast <float>(pow(1.0-u,(n-1.0-i)))
+                                *(static_cast <float>(fact(m-1.0))
+                                                            /(static_cast <float>(fact(j))
+                                                              *static_cast <float>(fact(m-1.0-j))))
+                                *static_cast <float>(pow(v,j))*
+                                static_cast <float>(pow(1.0-v,(m-1.0-j))))*vectpts.at(i*2+j)[k];*/
+                                qDebug()<<"temp : "<<temp;
+                                qDebug()<<"vector "<<k<<" :"<<vectpts.at(j*2+k)[i];
+                                temp += (fact(n-1)/(fact(j)*fact(n-1-j)))*pow(u,j)*pow(1-u,(n-1-j))*
+                                        (fact(m-1)/
+                                         (fact(k)*fact(m-1-k)))*pow(v,k)*
+                                        pow(1-v,(m-1-k))*vectpts.at(j*2+k)[i];
+                    }
+                }
+                point[i] =  temp;
+            }
+            map_dis_pts.insert(_mesh->add_vertex(point).idx(),point);
+
+            v = v + 1.0/10.0;
+        }
+        u = u + 1.0/10.0;
+
+    }
+
+
 
     setColors(_mesh);
 
