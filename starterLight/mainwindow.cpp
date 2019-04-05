@@ -816,8 +816,8 @@ void MainWindow::on_draw_button_clicked()
     //int n = 10;
     //int m = vectpts.size();
 
-    int n = 2;
-    int m = 4;
+    int n = sqrt(vectpts.size());
+    int m = sqrt(vectpts.size());
     /*
     for (int i = 0; i < n; i++)
     {
@@ -868,10 +868,12 @@ void MainWindow::on_draw_button_clicked()
                                 static_cast <float>(pow(1.0-v,(m-1.0-j))))*vectpts.at(i*2+j)[k];*/
                                 qDebug()<<"temp : "<<temp;
                                 qDebug()<<"vector "<<k<<" :"<<vectpts.at(j*2+k)[i];
-                                temp += (fact(n-1)/(fact(j)*fact(n-1-j)))*pow(u,j)*pow(1-u,(n-1-j))*
+                                temp += (fact(n-1)/
+                                         (fact(j)*fact(n-1-j)))
+                                        *pow(u,j)*pow(1-u,(n-1-j))*
                                         (fact(m-1)/
                                          (fact(k)*fact(m-1-k)))*pow(v,k)*
-                                        pow(1-v,(m-1-k))*vectpts.at(j*2+k)[i];
+                                        pow(1-v,(m-1-k))*vectpts.at(j*m+k)[i];
                     }
                 }
                 point[i] =  temp;
