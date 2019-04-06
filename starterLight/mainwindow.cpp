@@ -299,6 +299,15 @@ void MainWindow::on_pushButton_chargement_clicked()
     resetAllColorsAndThickness(&mesh);
 
     // on affiche le maillage
+    map_dis_pts.clear();
+    map_ctrl_pts.clear();
+    vectpts.clear();
+    for(int i = 0; i<mesh.n_vertices();i++)
+    {
+        MyMesh::Point pt = mesh.point(mesh.vertex_handle(i));
+        map_ctrl_pts.insert(i,pt);
+        vectpts.push_back(pt);
+    }
     displayMesh(&mesh);
 }
 
