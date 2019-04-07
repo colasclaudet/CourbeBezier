@@ -225,7 +225,7 @@ void MainWindow::on_pushButton_vertexPlus_clicked()
         showSelectionsNeighborhood(&mesh);
 }
 
-void MainWindow::on_pushButton_edgeMoins_clicked()
+/*void MainWindow::on_pushButton_edgeMoins_clicked()
 {
     // mise à jour de l'interface
     edgeSelection = edgeSelection - 1;
@@ -236,9 +236,9 @@ void MainWindow::on_pushButton_edgeMoins_clicked()
         showSelections(&mesh);
     else
         showSelectionsNeighborhood(&mesh);
-}
+}*/
 
-void MainWindow::on_pushButton_edgePlus_clicked()
+/*void MainWindow::on_pushButton_edgePlus_clicked()
 {
     // mise à jour de l'interface
     edgeSelection = edgeSelection + 1;
@@ -249,7 +249,7 @@ void MainWindow::on_pushButton_edgePlus_clicked()
         showSelections(&mesh);
     else
         showSelectionsNeighborhood(&mesh);
-}
+}*/
 
 /*void MainWindow::on_pushButton_faceMoins_clicked()
 {
@@ -799,8 +799,9 @@ void MainWindow::refreshCtrlPts(MyMesh *_mesh)
     foreach(MyMesh::Point pt, map_ctrl_pts)
     {
         int idx = _mesh->add_vertex(pt).idx();
-        vectpts[i] = pt;
+        vectpts[vertexSelection] = pt;
     }
+
     //setColors(_mesh);
 
     //displayMesh(_mesh);
@@ -934,4 +935,15 @@ void MainWindow::on_pushButton_clicked()
         data<<"v "<<pt[0]<<" "<<pt[1]<<" "<<pt[2]<<endl;
     }
 
+}
+
+void MainWindow::on_hide_button_clicked()
+{
+    MyMesh * _mesh = &mesh;
+    foreach(MyMesh::Point pt, map_ctrl_pts)
+    {
+        _mesh->set_color(_mesh->vertex_handle(map_ctrl_pts.key(pt)), MyMesh::Color(0, 0, 255));
+        _mesh->data(_mesh->vertex_handle(map_ctrl_pts.key(pt))).thickness = 0;
+    }
+    displayMesh(_mesh);
 }

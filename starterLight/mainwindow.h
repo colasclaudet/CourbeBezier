@@ -79,12 +79,12 @@ private slots:
     void on_pushButton_chargement_clicked();
     void on_pushButton_vertexMoins_clicked();
     void on_pushButton_vertexPlus_clicked();
-    void on_pushButton_edgeMoins_clicked();
-    void on_pushButton_edgePlus_clicked();
-    void on_pushButton_faceMoins_clicked();
-    void on_pushButton_facePlus_clicked();
+    //void on_pushButton_edgeMoins_clicked();
+    //void on_pushButton_edgePlus_clicked();
+    //void on_pushButton_faceMoins_clicked();
+    //void on_pushButton_facePlus_clicked();
     void on_pushButton_afficherChemin_clicked();
-    void on_pushButton_voisinage_clicked();
+    //void on_pushButton_voisinage_clicked();
     void on_pushButton_bordure_clicked();
 
     void on_addControlPointButton_clicked();
@@ -98,6 +98,8 @@ private slots:
     void on_v_slider_sliderMoved(int position);
 
     void on_pushButton_clicked();
+
+    void on_hide_button_clicked();
 
 private:
 
